@@ -20,6 +20,9 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
+      exceptionFactory: (errors) => {
+        errors.map((e) => logger.error(e.constraints));
+      },
     }),
   );
 
