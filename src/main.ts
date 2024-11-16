@@ -1,17 +1,20 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { Transport } from '@nestjs/microservices';
+import { Transport, type MicroserviceOptions } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 import { envs } from './config';
 
 async function bootstrap() {
   const logger = new Logger('AuthMicroserviceMain');
-  const app = await NestFactory.createMicroservice(AppModule, {
-    transport: Transport.NATS,
-    options: {
-      servers: envs.natsServers,
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
+      transport: Transport.NATS,
+      options: {
+        servers: envs.natsServers,
+      },
     },
-  });
+  );
 
   app.useGlobalPipes(
     new ValidationPipe({
