@@ -21,4 +21,9 @@ export class AuthController {
   verifyToken(@Payload() token: string) {
     return this.authService.verifyToken(token);
   }
+
+  @MessagePattern('auth.execute.seed')
+  async executeSeed() {
+    return this.authService.executeSeed();
+  }
 }
