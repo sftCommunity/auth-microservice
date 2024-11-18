@@ -11,7 +11,8 @@ import { LoginUserDto, RegisterUserDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { envs } from 'src/config';
-import { JwtPayload } from './inferfaces/jwt-payload.interface';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { initialData } from 'src/seed/data';
 
 @Injectable()
 export class AuthService extends PrismaClient implements OnModuleInit {
@@ -107,6 +108,31 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         status: HttpStatus.UNAUTHORIZED,
         message: 'Invalid token',
       });
+    }
+  }
+
+  private async deleteTables() {
+    await this.user.deleteMany();
+  }
+
+  private async insertUsers() {
+    const seedUsers = initialData.users;
+
+    await this.user.createMany({
+      data: seedUsers,
+    });
+  }
+
+  async executeSeed() {
+    try {
+      await this.deleteTables();
+      await this.insertUsers();
+      return {
+        status: HttpStatus.ACCEPTED,
+        message: 'Seed executed successfully',
+      };
+    } catch (e) {
+      throw new RpcException(e);
     }
   }
 }
