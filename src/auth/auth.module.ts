@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { envs } from 'src/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { LoginAttempt, Session, User } from './entities';
+import { LoginAttempt, PasswordReset, Session, User } from './entities';
 import { JwtStrategy } from './strategies';
 @Module({
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
   imports: [
-    TypeOrmModule.forFeature([User, Session, LoginAttempt]),
+    TypeOrmModule.forFeature([User, Session, LoginAttempt, PasswordReset]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: envs.jwtSecret,
