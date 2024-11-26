@@ -1,9 +1,12 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    PrimaryGeneratedColumn,
+  BeforeInsert,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+import { User } from './user.entity';
 
 @Entity('sessions')
 export class Session {
@@ -19,6 +22,18 @@ export class Session {
   @CreateDateColumn()
   created_at: Date;
 
-  @Column('timestamp', { nullable: false })
+  @Column('timestamp')
   expires_at: Date;
+
+  @ManyToOne(() => User, (user) => user.sessions, {
+    onDelete: 'CASCADE',
+  })
+  user: User;
+
+  @BeforeInsert()
+  setExpirationDate() {
+    const expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + 2);
+    this.expires_at = expirationDate;
+  }
 }

@@ -5,9 +5,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Session } from './session.entity';
 
 @Entity('users')
 export class User {
@@ -41,6 +43,11 @@ export class User {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @OneToMany(() => Session, (session) => session.user, {
+    cascade: true,
+  })
+  sessions: Session[];
 
   @BeforeInsert()
   checkFieldBeforeInsert() {
