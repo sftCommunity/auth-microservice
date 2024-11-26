@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { envs } from 'src/config';
 import { Repository } from 'typeorm';
 import { LoginUserDto, RegisterUserDto } from './dto';
-import { User } from './entities';
+import { Session, User } from './entities';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
@@ -14,6 +14,8 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Session)
+    private readonly sessionRepository: Repository<Session>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -39,7 +41,7 @@ export class AuthService {
 
       return {
         ...new_user,
-        token: this.signJWT({
+        token: await this.signJWT({
           id: new_user.id,
           name: new_user.name,
           email: new_user.email,
@@ -77,7 +79,7 @@ export class AuthService {
 
       return {
         user: user,
-        token: this.signJWT({
+        token: await this.signJWT({
           id: user.id,
           name: user.name,
           email: user.email,
@@ -88,7 +90,9 @@ export class AuthService {
     }
   }
 
-  async verifyToken(token: string) {
+  async verifyToken(
+    token: string,
+  ): Promise<{ user: JwtPayload; token: string }> {
     try {
       const { sub, iat, exp, ...user } = this.jwtService.verify(token, {
         secret: envs.jwtSecret,
@@ -106,7 +110,18 @@ export class AuthService {
     }
   }
 
-  async logout(token: string) {
-    return 'logout';
+  async createSession(token: string): Promise<Session> {
+    const { user, token: token_signed } = await this.verifyToken(token);
+    try {
+      const session = this.sessionRepository.create({
+        user_id: user.id,
+        token: token_signed,
+      });
+
+      await this.sessionRepository.save(session);
+      return session;
+    } catch (e) {
+      throw new RpcException(e);
+    }
   }
 }
