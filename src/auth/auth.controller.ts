@@ -22,8 +22,8 @@ export class AuthController {
     return this.authService.verifyToken(token);
   }
 
-  @MessagePattern('auth.execute.seed')
-  async executeSeed() {
-    return this.authService.executeSeed();
+  @MessagePattern('auth.logout.session')
+  logout(@Payload() token: string) {
+    return this.authService.logout(token);
   }
 }
