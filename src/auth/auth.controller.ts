@@ -22,8 +22,8 @@ export class AuthController {
     return this.authService.verifyToken(token);
   }
 
-  @MessagePattern('auth.logout.session')
-  logout(@Payload() token: string) {
-    return this.authService.logout(token);
+  @MessagePattern('auth.create.session')
+  createSession(@Payload() token: string) {
+    return this.authService.createSession(token);
   }
 }
