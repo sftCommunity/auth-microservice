@@ -1,59 +1,49 @@
-import {
-  HttpStatus,
-  Injectable,
-  Logger,
-  type OnModuleInit,
-} from '@nestjs/common';
-import { RpcException } from '@nestjs/microservices';
-import { PrismaClient } from '@prisma/client';
-import { LoginUserDto, RegisterUserDto } from './dto';
-
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { RpcException } from '@nestjs/microservices';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { envs } from 'src/config';
+import { Repository } from 'typeorm';
+import { LoginUserDto, RegisterUserDto } from './dto';
+import { User } from './entities';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { initialData } from 'src/seed/data';
 
 @Injectable()
-export class AuthService extends PrismaClient implements OnModuleInit {
-  private readonly logger = new Logger(AuthService.name);
-
-  constructor(private readonly jwtService: JwtService) {
-    super();
-  }
-
-  async onModuleInit() {
-    await this.$connect();
-    this.logger.log('Connected to MongoDB');
-  }
+export class AuthService {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async signJWT(payload: JwtPayload) {
     return this.jwtService.sign(payload);
   }
 
   async registerUser(registerUserDto: RegisterUserDto) {
-    const { name, email, password } = registerUserDto;
+    const { email, password, ...rest_user } = registerUserDto;
 
     try {
-      const user = await this.user.findUnique({
-        where: { email },
-      });
+      const user = await this.userRepository.findOneBy({ email });
 
       if (user) throw new RpcException('User already exists');
 
-      const newUser = await this.user.create({
-        data: {
-          email,
-          password: bcrypt.hashSync(password, 10),
-          name,
-        },
+      const new_user = this.userRepository.create({
+        ...rest_user,
+        password: bcrypt.hashSync(password, 10),
       });
 
-      const { password: _, ...userWithoutPassword } = newUser;
+      await this.userRepository.save(new_user);
+      delete new_user.password;
 
       return {
-        user: userWithoutPassword,
-        token: await this.signJWT(userWithoutPassword),
+        ...new_user,
+        token: this.signJWT({
+          id: new_user.id,
+          name: new_user.name,
+          email: new_user.email,
+        }),
       };
     } catch (e) {
       throw new RpcException(e);
@@ -64,29 +54,34 @@ export class AuthService extends PrismaClient implements OnModuleInit {
     const { email, password } = loginUserDto;
 
     try {
-      const user = await this.user.findUnique({
+      const user = await this.userRepository.findOne({
         where: { email },
+        select: { email: true, password: true, id: true },
       });
 
       if (!user)
         throw new RpcException({
-          status: HttpStatus.BAD_REQUEST,
-          message: 'Invalid credentials',
+          status: HttpStatus.UNAUTHORIZED,
+          message: 'Invalid email',
         });
 
       const isPasswordValid = bcrypt.compareSync(password, user.password);
 
       if (!isPasswordValid)
         throw new RpcException({
-          status: HttpStatus.BAD_REQUEST,
-          message: 'Invalid credentials',
+          status: HttpStatus.UNAUTHORIZED,
+          message: 'Invalid password',
         });
 
-      const { password: _, ...userWithoutPassword } = user;
+      delete user.password;
 
       return {
-        user: userWithoutPassword,
-        token: await this.signJWT(userWithoutPassword),
+        user: user,
+        token: this.signJWT({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        }),
       };
     } catch (e) {
       throw new RpcException(e);
@@ -111,28 +106,7 @@ export class AuthService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  private async deleteTables() {
-    await this.user.deleteMany();
-  }
-
-  private async insertUsers() {
-    const seedUsers = initialData.users;
-
-    await this.user.createMany({
-      data: seedUsers,
-    });
-  }
-
-  async executeSeed() {
-    try {
-      await this.deleteTables();
-      await this.insertUsers();
-      return {
-        status: HttpStatus.ACCEPTED,
-        message: 'Seed executed successfully',
-      };
-    } catch (e) {
-      throw new RpcException(e);
-    }
+  async logout(token: string) {
+    return 'logout';
   }
 }
