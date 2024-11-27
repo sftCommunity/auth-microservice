@@ -1,4 +1,10 @@
-import { IsEmail, IsString, IsStrongPassword } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsOptional,
+  IsString,
+  IsStrongPassword,
+} from 'class-validator';
 
 export class RegisterUserDto {
   @IsString()
@@ -11,4 +17,8 @@ export class RegisterUserDto {
   @IsString()
   @IsStrongPassword()
   password: string;
+
+  @IsBoolean()
+  @IsOptional()
+  is_active: boolean = true;
 }
