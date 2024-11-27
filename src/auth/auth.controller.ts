@@ -2,6 +2,7 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
 import { LoginUserDto, RegisterUserDto } from './dto';
+import { VerifyTokenResponse } from './interfaces';
 
 @Controller('auth')
 export class AuthController {
@@ -18,12 +19,7 @@ export class AuthController {
   }
 
   @MessagePattern('auth.verify.token')
-  verifyToken(@Payload() token: string) {
+  verifyToken(@Payload() token: string): Promise<VerifyTokenResponse> {
     return this.authService.verifyToken(token);
-  }
-
-  @MessagePattern('auth.create.session')
-  createSession(@Payload() token: string) {
-    return this.authService.createSession(token);
   }
 }
