@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { UserPaginationDto } from './dto';
+import { UpdateUserDto, UserPaginationDto } from './dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -15,5 +15,10 @@ export class UserController {
   @MessagePattern('user.find.one')
   findOne(@Payload() term: string) {
     return this.userService.findOne(term);
+  }
+
+  @MessagePattern('user.update')
+  update(@Payload() updateUserDto: UpdateUserDto) {
+    return this.userService.update(updateUserDto);
   }
 }

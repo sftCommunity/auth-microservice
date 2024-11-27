@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isEmail } from 'class-validator';
 import { Repository } from 'typeorm';
 import { validate as isUUID } from 'uuid';
-import { UserPaginationDto } from './dto';
+import { UpdateUserDto, UserPaginationDto } from './dto';
 import { User } from './entities';
 
 @Injectable()
@@ -61,6 +61,25 @@ export class UserService {
 
       return user;
     } catch (e) {
+      throw new RpcException(e);
+    }
+  }
+
+  async update(updateUserDto: UpdateUserDto) {
+    const { id, ...to_update } = updateUserDto;
+
+    try {
+      const user = await this.findOne(id);
+      const { affected } = await this.userRepository.update(id, to_update);
+      if (affected === 0)
+        throw new RpcException(`User with id ${id} not updated`);
+      return { ...user, ...to_update, id };
+    } catch (e) {
+      if (e.code === '23505')
+        throw new RpcException({
+          status: HttpStatus.CONFLICT,
+          message: `User with email ${to_update.email} already exists`,
+        });
       throw new RpcException(e);
     }
   }
