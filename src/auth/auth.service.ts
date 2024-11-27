@@ -77,7 +77,6 @@ export class AuthService {
         }),
       };
     } catch (e) {
-      console.log(e);
       throw new RpcException(e);
     }
   }
