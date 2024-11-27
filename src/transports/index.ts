@@ -1,0 +1,2 @@
+export * from './nats.module';
+
