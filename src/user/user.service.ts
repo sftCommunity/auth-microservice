@@ -65,7 +65,7 @@ export class UserService {
     }
   }
 
-  async update(updateUserDto: UpdateUserDto) {
+  async update(updateUserDto: UpdateUserDto): Promise<User> {
     const { id, ...to_update } = updateUserDto;
 
     try {
@@ -73,13 +73,30 @@ export class UserService {
       const { affected } = await this.userRepository.update(id, to_update);
       if (affected === 0)
         throw new RpcException(`User with id ${id} not updated`);
-      return { ...user, ...to_update, id };
+      return { ...user, ...to_update, id } as User;
     } catch (e) {
       if (e.code === '23505')
         throw new RpcException({
           status: HttpStatus.CONFLICT,
           message: `User with email ${to_update.email} already exists`,
         });
+      throw new RpcException(e);
+    }
+  }
+
+  async delete(id: string) {
+    const { is_active } = await this.findOne(id);
+
+    if (!is_active)
+      throw new RpcException({
+        status: HttpStatus.BAD_REQUEST,
+        message: `User with id ${id} is already deleted`,
+      });
+
+    try {
+      const user = await this.update({ id, is_active: false });
+      return user;
+    } catch (e) {
       throw new RpcException(e);
     }
   }
