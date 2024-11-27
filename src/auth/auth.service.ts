@@ -4,19 +4,18 @@ import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { envs } from 'src/config';
+import { User } from 'src/user/entities';
 import { Repository } from 'typeorm';
 import { LoginUserDto, RegisterUserDto } from './dto';
-import { Session, User } from './entities';
+import { VerifyTokenResponse } from './interfaces';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly jwtService: JwtService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(Session)
-    private readonly sessionRepository: Repository<Session>,
-    private readonly jwtService: JwtService,
   ) {}
 
   async signJWT(payload: JwtPayload) {
@@ -24,15 +23,15 @@ export class AuthService {
   }
 
   async registerUser(registerUserDto: RegisterUserDto) {
-    const { email, password, ...rest_user } = registerUserDto;
-
+    const { name, email, password } = registerUserDto;
     try {
       const user = await this.userRepository.findOneBy({ email });
 
       if (user) throw new RpcException('User already exists');
 
       const new_user = this.userRepository.create({
-        ...rest_user,
+        name,
+        email,
         password: bcrypt.hashSync(password, 10),
       });
 
@@ -61,19 +60,11 @@ export class AuthService {
         select: { email: true, password: true, id: true },
       });
 
-      if (!user)
-        throw new RpcException({
-          status: HttpStatus.UNAUTHORIZED,
-          message: 'Invalid email',
-        });
+      if (!user) throw new RpcException('Invalid email');
 
       const isPasswordValid = bcrypt.compareSync(password, user.password);
 
-      if (!isPasswordValid)
-        throw new RpcException({
-          status: HttpStatus.UNAUTHORIZED,
-          message: 'Invalid password',
-        });
+      if (!isPasswordValid) throw new RpcException('Invalid password');
 
       delete user.password;
 
@@ -86,13 +77,12 @@ export class AuthService {
         }),
       };
     } catch (e) {
+      console.log(e);
       throw new RpcException(e);
     }
   }
 
-  async verifyToken(
-    token: string,
-  ): Promise<{ user: JwtPayload; token: string }> {
+  async verifyToken(token: string): Promise<VerifyTokenResponse> {
     try {
       const { sub, iat, exp, ...user } = this.jwtService.verify(token, {
         secret: envs.jwtSecret,
@@ -107,21 +97,6 @@ export class AuthService {
         status: HttpStatus.UNAUTHORIZED,
         message: 'Invalid token',
       });
-    }
-  }
-
-  async createSession(token: string): Promise<Session> {
-    const { user, token: token_signed } = await this.verifyToken(token);
-    try {
-      const session = this.sessionRepository.create({
-        user_id: user.id,
-        token: token_signed,
-      });
-
-      await this.sessionRepository.save(session);
-      return session;
-    } catch (e) {
-      throw new RpcException(e);
     }
   }
 }
