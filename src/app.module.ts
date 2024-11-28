@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { PermissionModule } from './permission/permission.module';
 import { RoleModule } from './role/role.module';
 import { SeedModule } from './seed/seed.module';
+import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SeedModule } from './seed/seed.module';
     AuthModule,
     SeedModule,
     RoleModule,
+    SessionModule,
     PermissionModule,
   ],
 })
