@@ -1,4 +1,5 @@
 import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { Session } from 'src/session/entities/session.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -9,7 +10,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Session } from '../../session/entities/session.entity';
 
 @Entity('users')
 export class User {
@@ -44,7 +44,7 @@ export class User {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => Session, (session) => session.user, {
+  @OneToMany(() => Session, (session) => session.user_id, {
     cascade: true,
   })
   sessions: Session[];
