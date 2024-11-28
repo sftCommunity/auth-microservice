@@ -43,6 +43,10 @@ export class Session {
 
   @BeforeInsert()
   setExpiresAt() {
-    this.expires_at = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+    const DAYS_TO_EXPIRE = 2;
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+    this.expires_at = new Date(
+      this.create_at.getTime() + DAYS_TO_EXPIRE * MS_PER_DAY,
+    );
   }
 }
