@@ -2,6 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isEmail } from 'class-validator';
+import { RegisterUserDto } from 'src/auth/dto';
 import { Repository } from 'typeorm';
 import { validate as isUUID } from 'uuid';
 import { UpdateUserDto, UserPaginationDto } from './dto';
@@ -13,6 +14,26 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
+
+  async create(registerUserDto: RegisterUserDto) {
+    const { email } = registerUserDto;
+    const user = await this.userRepository.findOne({
+      where: { email },
+    });
+
+    if (user)
+      throw new RpcException({
+        status: HttpStatus.CONFLICT,
+        message: `User with email ${email} already exists`,
+      });
+
+    try {
+      const user = this.userRepository.create(registerUserDto);
+      return await this.userRepository.save(user);
+    } catch (e) {
+      throw new RpcException(e);
+    }
+  }
 
   async findAll(userPaginationDto: UserPaginationDto) {
     const { limit = 10, page = 1, is_active = true } = userPaginationDto;
