@@ -5,16 +5,17 @@ import { PermissionModule } from './permission/permission.module';
 import { RoleModule } from './role/role.module';
 import { SeedModule } from './seed/seed.module';
 import { SessionModule } from './session/session.module';
+import { envs } from './config';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.HOST_DB,
-      port: +process.env.PORT_DB,
-      database: process.env.POSTGRES_DB,
-      username: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
+      host: envs.hostDb,
+      port: envs.portDb,
+      database: envs.postgresDb,
+      username: envs.postgresUser,
+      password: envs.postgresPassword,
       autoLoadEntities: true,
       synchronize: true,
     }),
