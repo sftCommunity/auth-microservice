@@ -1,8 +1,53 @@
-version: '3.8'
-
 services:
-  authdb:
-    container_name: authdb
+
+  nats-server:
+    image: nats:latest
+    ports:
+      - 8222:8222
+
+  # authentication-production:
+  #   container_name: authentication-production
+  #   build:
+  #     target: production
+  #     context: .
+  #     args:
+  #       - PORT=${PORT:-3000}
+  #   ports:
+  #     - "${PORT:-3000}:${PORT:-3000}"
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: "1"
+  #         memory: "512m"
+  #       reservations:
+  #         cpus: "0.25"
+  #         memory: "256m"
+
+  authentication-development:
+    container_name: authentication-development
+    restart: unless-stopped
+    env_file: .env
+    build:
+      target: dev
+      context: .
+      args:
+        - PORT=${PORT:-3000}
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+      - "9229:9229"
+    volumes:
+      - ./src:/app/src
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "512m"
+        reservations:
+          cpus: "0.25"
+          memory: "256m"
+
+  authentication-database:
+    container_name: authentication-database
     image: postgres:16.2
     restart: always
     volumes:
