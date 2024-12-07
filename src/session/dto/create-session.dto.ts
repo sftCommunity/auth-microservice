@@ -29,5 +29,5 @@ export class CreateSessionDto {
 
   @IsBoolean()
   @IsOptional()
-  is_active: boolean = true;
+  is_active = true;
 }

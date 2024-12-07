@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { RegisterUserDto } from 'src/auth/dto';
+
 import { UpdateUserDto, UserPaginationDto } from './dto';
 import { UserService } from './user.service';
 

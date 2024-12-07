@@ -5,6 +5,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { envs } from 'src/config';
 import { User } from 'src/user/entities';
 import { Repository } from 'typeorm';
+
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 
 @Injectable()

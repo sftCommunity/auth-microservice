@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { envs } from 'src/config';
 import { User } from 'src/user/entities';
 import { Repository } from 'typeorm';
+
 import { LoginUserDto, RegisterUserDto } from './dto';
 import { VerifyTokenResponse } from './interfaces';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
@@ -46,8 +47,8 @@ export class AuthService {
           email: new_user.email,
         }),
       };
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 
@@ -76,8 +77,8 @@ export class AuthService {
           email: user.email,
         }),
       };
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 
@@ -91,7 +92,7 @@ export class AuthService {
         user,
         token: await this.signJWT(user),
       };
-    } catch (e) {
+    } catch {
       throw new RpcException({
         status: HttpStatus.UNAUTHORIZED,
         message: 'Invalid token',

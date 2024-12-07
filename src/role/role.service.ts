@@ -3,6 +3,7 @@ import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from 'src/common/dto';
 import { Repository } from 'typeorm';
+
 import { CreateRoleDto } from './dto/create-role.dto';
 import { Role } from './entities';
 
@@ -18,20 +19,15 @@ export class RoleService {
       const new_role = this.roleRepository.create(createRoleDto);
       await this.roleRepository.save(new_role);
       return new_role;
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 
   async findOne(term: string) {
     let role: Role;
     try {
-      if (!isNaN(+term)) {
-        role = await this.roleRepository.findOne({
-          where: { id: +term },
-          relations: ['permissions'],
-        });
-      } else {
+      if (isNaN(+term)) {
         const queryBuilder = this.roleRepository.createQueryBuilder('role');
         role = await queryBuilder
           .where('UPPER(role_name) = :role_name', {
@@ -39,12 +35,17 @@ export class RoleService {
           })
           .leftJoinAndSelect('role.permissions', 'permissions')
           .getOne();
+      } else {
+        role = await this.roleRepository.findOne({
+          where: { id: +term },
+          relations: ['permissions'],
+        });
       }
 
       if (!role) throw new RpcException(`Role with term ${term} not found`);
       return role;
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 
@@ -64,8 +65,8 @@ export class RoleService {
           total,
         },
       };
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 
@@ -86,8 +87,8 @@ export class RoleService {
         status: HttpStatus.ACCEPTED,
         message: `Deleted ${affected} roles`,
       };
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 }

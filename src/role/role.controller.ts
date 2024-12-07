@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { PaginationDto } from 'src/common/dto';
+
 import { CreateRoleDto } from './dto/create-role.dto';
 import { RoleService } from './role.service';
 

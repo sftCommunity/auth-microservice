@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { PaginationDto } from 'src/common/dto';
+
 import { CreatePermissionDto } from './dto';
 import { PermissionService } from './permission.service';
 

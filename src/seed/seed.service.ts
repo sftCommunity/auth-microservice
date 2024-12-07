@@ -1,9 +1,11 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
-import { Session } from 'src/auth/entities';
+import { Session } from 'src/session/entities';
+import { User } from 'src/user/entities';
 import { Repository } from 'typeorm';
-import { User } from '../auth/entities/user.entity';
+
 import { initialData } from './data/data';
 
 @Injectable()
@@ -16,16 +18,18 @@ export class SeedService {
     private readonly authService: AuthService,
   ) {}
 
-  async executeSeed(
-    token: string,
-  ): Promise<{ status: number; message: string }> {
-    await this.deleteTables();
-    await this.insertUsers();
-    await this.insertSessions(token);
-    return {
-      status: HttpStatus.OK,
-      message: 'Seed executed successfully',
-    };
+  async executeSeed(): Promise<{ status: number; message: string }> {
+    try {
+      await this.deleteTables();
+      await this.insertUsers();
+      // await this.insertSessions(token);
+      return {
+        status: HttpStatus.OK,
+        message: 'Seed executed successfully',
+      };
+    } catch (error) {
+      throw new RpcException(error);
+    }
   }
 
   private async deleteTables(): Promise<void> {
@@ -40,22 +44,22 @@ export class SeedService {
   private async insertUsers(): Promise<void> {
     const seedUsers = initialData.users;
     const users: User[] = [];
-    seedUsers.forEach((user) => {
+    for (const user of seedUsers) {
       users.push(this.userRepository.create(user));
-    });
+    }
     await this.userRepository.save(users);
   }
 
-  private async insertSessions(token: string): Promise<Session> {
-    const { user, token: token_signed } =
-      await this.authService.verifyToken(token);
+  // private async insertSessions(token: string): Promise<Session> {
+  //   const { user, token: token_signed } =
+  //     await this.authService.verifyToken(token);
 
-    const session = this.sessionRepository.create({
-      user_id: user.id,
-      token: token_signed,
-    });
+  // const session = this.sessionRepository.create({
+  //   user_id: user.id,
+  //   token: token_signed,
+  // });
+  // const sessionSaved = await this.sessionRepository.save(session);
+  // return sessionSaved;
 
-    const sessionSaved = await this.sessionRepository.save(session);
-    return sessionSaved;
-  }
+  // }
 }

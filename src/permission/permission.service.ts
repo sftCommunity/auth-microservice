@@ -3,6 +3,7 @@ import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from 'src/common/dto';
 import { Repository } from 'typeorm';
+
 import { CreatePermissionDto } from './dto';
 import { Permission } from './entities';
 
@@ -16,12 +17,7 @@ export class PermissionService {
   async findOne(term: string) {
     let permission: Permission;
     try {
-      if (!isNaN(+term)) {
-        permission = await this.permissionRepository.findOne({
-          where: { id: +term },
-          relations: ['roles'],
-        });
-      } else {
+      if (isNaN(+term)) {
         const queryBuilder =
           this.permissionRepository.createQueryBuilder('permission');
         permission = await queryBuilder
@@ -30,14 +26,19 @@ export class PermissionService {
           })
           .leftJoinAndSelect('permission.roles', 'roles')
           .getOne();
+      } else {
+        permission = await this.permissionRepository.findOne({
+          where: { id: +term },
+          relations: ['roles'],
+        });
       }
 
       if (!permission)
         throw new RpcException(`Permission with term ${term} not found`);
 
       return permission;
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 
@@ -57,8 +58,8 @@ export class PermissionService {
           total,
         },
       };
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 
@@ -66,8 +67,8 @@ export class PermissionService {
     const { name } = createPermissionDto;
     try {
       return await this.permissionRepository.save(createPermissionDto);
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 
@@ -88,8 +89,8 @@ export class PermissionService {
         status: HttpStatus.ACCEPTED,
         message: `Deleted ${affected} permissions`,
       };
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 }

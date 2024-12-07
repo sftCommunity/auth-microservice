@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { AuthModule } from './auth/auth.module';
+import { envs } from './config';
 import { PermissionModule } from './permission/permission.module';
 import { RoleModule } from './role/role.module';
 import { SeedModule } from './seed/seed.module';
 import { SessionModule } from './session/session.module';
-import { envs } from './config';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { envs } from './config';
       synchronize: true,
     }),
     AuthModule,
+    UserModule,
     SeedModule,
     RoleModule,
     SessionModule,

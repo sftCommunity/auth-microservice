@@ -1,11 +1,12 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { Transport, type MicroserviceOptions } from '@nestjs/microservices';
+import { type MicroserviceOptions, Transport } from '@nestjs/microservices';
+
 import { AppModule } from './app.module';
 import { envs } from './config';
 
 async function bootstrap() {
-  const logger = new Logger('AuthMicroserviceMain');
+  const logger = new Logger('Authentication');
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
     {
@@ -21,13 +22,15 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       exceptionFactory: (errors) => {
-        errors.map((e) => logger.error(e.constraints));
+        errors.map((e) => {
+          logger.error(e.constraints);
+        });
       },
     }),
   );
 
   await app.listen();
-  logger.log(`Auth microservice running on port ${envs.port}`);
+  logger.log(`running on port ${envs.port}`);
 }
 
 bootstrap();

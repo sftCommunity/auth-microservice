@@ -5,6 +5,7 @@ import { isEmail } from 'class-validator';
 import { RegisterUserDto } from 'src/auth/dto';
 import { Repository } from 'typeorm';
 import { validate as isUUID } from 'uuid';
+
 import { UpdateUserDto, UserPaginationDto } from './dto';
 import { User } from './entities';
 
@@ -30,8 +31,8 @@ export class UserService {
     try {
       const user = this.userRepository.create(registerUserDto);
       return await this.userRepository.save(user);
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 
@@ -53,8 +54,8 @@ export class UserService {
           total,
         },
       };
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 
@@ -81,8 +82,8 @@ export class UserService {
       if (!user) throw new RpcException(`User with term ${term} not found`);
 
       return user;
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 
@@ -95,13 +96,13 @@ export class UserService {
       if (affected === 0)
         throw new RpcException(`User with id ${id} not updated`);
       return { ...user, ...to_update, id } as User;
-    } catch (e) {
-      if (e.code === '23505')
+    } catch (error) {
+      if (error.code === '23505')
         throw new RpcException({
           status: HttpStatus.CONFLICT,
           message: `User with email ${to_update.email} already exists`,
         });
-      throw new RpcException(e);
+      throw new RpcException(error);
     }
   }
 
@@ -117,8 +118,8 @@ export class UserService {
     try {
       const user = await this.update({ id, is_active: false });
       return user;
-    } catch (e) {
-      throw new RpcException(e);
+    } catch (error) {
+      throw new RpcException(error);
     }
   }
 }
