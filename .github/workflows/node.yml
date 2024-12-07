@@ -21,7 +21,7 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
       - name: Install dependencies 📦
-        if: step.cache-node_modules.output.cache-hit != 'true'
+        if: steps.cache-node_modules.output.cache-hit != 'true'
         run: npm ci
       - name: Build typescript 📦
         run: node --run build && find dist/main.js
