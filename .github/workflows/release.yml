@@ -19,7 +19,7 @@ on:
       environment:
         description: 'Environment to run tests against'
         type: environment
-        default: 'Development'
+        default: 'development'
         required: true
 
 permissions:
