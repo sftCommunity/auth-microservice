@@ -6,7 +6,6 @@ import { envs } from './config';
 import { PermissionModule } from './permission/permission.module';
 import { RoleModule } from './role/role.module';
 import { SeedModule } from './seed/seed.module';
-import { SessionModule } from './session/session.module';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -25,7 +24,6 @@ import { UserModule } from './user/user.module';
     UserModule,
     SeedModule,
     RoleModule,
-    SessionModule,
     PermissionModule,
   ],
 })

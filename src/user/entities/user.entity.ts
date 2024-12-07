@@ -1,5 +1,4 @@
 import { IsBoolean, IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { Session } from 'src/session/entities/session.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -43,11 +42,6 @@ export class User {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @OneToMany(() => Session, (session) => session.user_id, {
-    cascade: true,
-  })
-  sessions: Session[];
 
   @BeforeInsert()
   checkFieldBeforeInsert() {
