@@ -18,7 +18,8 @@
     "lint:file": "eslint --ignore-path .gitignore",
     "lint:yaml": "chmod +x scripts/lint_yaml.sh && ./scripts/lint_yaml.sh",
     "prepare": "[ -f .husky/install.mjs ] && node .husky/install.mjs || true",
-    "typos": "chmod +x scripts/check_typos.sh && ./scripts/check_typos.sh"
+    "typos": "chmod +x scripts/check_typos.sh && ./scripts/check_typos.sh",
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
