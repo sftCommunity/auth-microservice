@@ -14,7 +14,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package*.json') }}-${{ hashFiles('.github/actions/node.yml') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('package*.json') }}-${{ hashFiles('.github/workflows/node.yml') }}
       - name: Setup Node ⚙️
         uses: actions/setup-node@v4
         with:
