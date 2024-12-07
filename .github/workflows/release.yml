@@ -1,0 +1,55 @@
+name: '💅 Semantic Release'
+
+on:
+  push:
+    branches:
+      - main
+      - next
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        default: 'Development'
+        required: true
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛬
+        uses: actions/checkout@v4
+      - name: 'Cache dependencies'
+        id: cache-node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package*.json') }}-${{ hashFiles('.github/workflows/release.yml') }}
+      - name: Setup Node ⚙️
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - name: Install dependencies 📦
+        if: steps.cache-node_modules.output.cache-hit != 'true'
+        run: npm ci
+      - name: Semantic release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          ENVIRONMENT: ${{ inputs.environment }}
+        run: npm run semantic-release
