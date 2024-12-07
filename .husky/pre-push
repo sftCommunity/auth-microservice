@@ -1,0 +1,2 @@
+node --run build
+find dist/main.js
