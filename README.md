@@ -13,3 +13,56 @@
   <a href="https://swc.rs/"><img src="https://img.shields.io/badge/Compiler-SWC_-orange.svg" alt="swc"/></a>
   <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Dockerized 🐳_-blue.svg" alt="docker"/></a>
 </p>
+
+## Features
+
+- **Authentication**: Secure user authentication using JWT.
+- **Authorization**: Role-based access control for protected routes.
+- **Scalability**: Built with microservice architecture for scalability.
+- **Performance**: Optimized with SWC for fast builds and execution.
+- **Containerization**: Fully Dockerized for easy deployment.
+
+## Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/sftCommunity/auth-microservice.git
+cd auth-microservice
+```
+
+2. Install dependencies:
+
+```bash
+pnpm install
+```
+
+3. Set up environment variables:
+
+- Copy `.env.template` to `.env` and configure the required variables.
+
+4. Run the application:
+
+```bash
+pnpm run start:dev
+```
+
+<!--
+## Testing
+
+Run unit and integration tests:
+```bash
+pnpm test
+``` -->
+
+## Docker
+
+Build and run the Docker container:
+
+```bash
+docker compose up --build
+```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
