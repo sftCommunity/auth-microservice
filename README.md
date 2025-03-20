@@ -14,6 +14,10 @@
   <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Dockerized 🐳_-blue.svg" alt="docker"/></a>
 </p>
 
+## Description
+
+The Authentication Microservice is a robust and scalable solution for managing user authentication and authorization in modern applications. Built with NestJS, it leverages the power of TypeScript, SWC, and Docker to deliver high performance and ease of deployment. This microservice is designed to integrate seamlessly into a microservices architecture, providing secure JWT-based authentication and role-based access control for protected resources.
+
 ## Features
 
 - **Authentication**: Secure user authentication using JWT.
