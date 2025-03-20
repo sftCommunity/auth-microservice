@@ -9,6 +9,7 @@ import { User } from 'src/user/entities';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies';
+
 @Module({
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

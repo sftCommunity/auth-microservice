@@ -19,6 +19,7 @@ import { UserModule } from './user/user.module';
       password: envs.postgresPassword,
       autoLoadEntities: true,
       synchronize: true,
+      logging: true,
     }),
     AuthModule,
     UserModule,
