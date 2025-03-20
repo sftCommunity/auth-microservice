@@ -4,28 +4,10 @@ services:
     ports:
       - 4222:4222
 
-  # authentication-production:
-  #   container_name: authentication-production
-  #   build:
-  #     target: production
-  #     context: .
-  #     args:
-  #       - PORT=${PORT:-3000}
-  #   ports:
-  #     - "${PORT:-3000}:${PORT:-3000}"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "1"
-  #         memory: "512m"
-  #       reservations:
-  #         cpus: "0.25"
-  #         memory: "256m"
-
-  auth-dev:
+  authentication:
     depends_on:
       - nats-server
-    container_name: auth-dev
+    container_name: authentication
     restart: unless-stopped
     env_file: .env
     build:
@@ -47,15 +29,12 @@ services:
           cpus: '0.25'
           memory: '256m'
 
-  auth-db:
-    container_name: auth-db
+  authentication-database:
+    container_name: authentication-database
     image: postgres:16.2
     restart: always
     volumes:
       - ./postgres:/var/lib/postgresql/data
     ports:
-      - 5432:5432
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: authdb
+      - ${PORT_DB:-5432}:${PORT_DB:-5432}
+    env_file: .env
