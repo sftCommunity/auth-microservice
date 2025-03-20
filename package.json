@@ -104,6 +104,8 @@
       "bcrypt"
     ],
     "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@swc/core",
       "bcrypt"
     ]
   }
